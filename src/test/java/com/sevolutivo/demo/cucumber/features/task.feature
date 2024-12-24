@@ -13,4 +13,9 @@ Feature: the task endpoint can be retrieved
     Given client wants to get task by id 1
     When client calls GET task endpoint with id
     Then client receives task with id 1
+
+  Scenario: client makes call to GET non-existing task
+    Given client wants to get task by id 2
+    When client calls GET task endpoint with id
+    Then client receives error code NOT_FOUND
     

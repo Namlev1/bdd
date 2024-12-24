@@ -7,15 +7,17 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 @CucumberContextConfiguration
 public class TaskSteps extends CucumberSpringConfiguration {
 
-    private ResponseEntity response;
+    private ResponseEntity<Object> response;
     private Task task;
     private int id;
 
@@ -31,17 +33,17 @@ public class TaskSteps extends CucumberSpringConfiguration {
 
     @When("client calls GET all tasks endpoint")
     public void clientCallsGetAllTasksEndpoint() {
-        response = testRestTemplate.getForEntity("/task/all/", List.class);
+        response = testRestTemplate.getForEntity("/task/all/", Object.class);
     }
 
     @When("client calls POST task endpoint")
     public void clientCallsPOSTTaskEndpoint() {
-        response = testRestTemplate.postForEntity("/task/", task, Task.class);
+        response = testRestTemplate.postForEntity("/task/", task, Object.class);
     }
 
     @When("client calls GET task endpoint with id")
     public void clientCallsGETTaskEndpointWithId() {
-        response = testRestTemplate.getForEntity("/task/id/" + id, Task.class);
+        response = testRestTemplate.getForEntity("/task/id/" + id, Object.class);
     }
 
     @Then("client receives all tasks \\(empty list)")
@@ -52,11 +54,26 @@ public class TaskSteps extends CucumberSpringConfiguration {
 
     @Then("client receives task with assigned id")
     public void clientReceivesTaskWithAssignedId() {
-        Assertions.assertNotEquals(0, ((Task) response.getBody()).getId());
+        Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
+        Assertions.assertNotEquals(0, responseTask.getId());
     }
 
     @Then("client receives task with id {int}")
     public void clientReceivesTaskWithId(int id) {
-        Assertions.assertEquals(id, ((Task) response.getBody()).getId());
+        Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
+        Assertions.assertEquals(id, responseTask.getId());
+    }
+
+    @Then("client receives error code NOT_FOUND")
+    public void clientReceivesStatusCodeNOT_FOUND() {
+        Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+    
+    private Task mapToTask(LinkedHashMap<String, Object> json){
+        Task task = new Task();
+        task.setId((Integer) json.get("id"));
+        task.setTitle((String) json.get("title"));
+        task.setDescription((String) json.get("description"));
+        return task;
     }
 }
