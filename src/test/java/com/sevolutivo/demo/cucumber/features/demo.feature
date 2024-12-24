@@ -1,6 +1,6 @@
 
-Feature: the hello endpoint can be retrieved
-  Scenario: client makes call to GET greeting endpoint
-    Given client wants to write username
-    When client calls greeting endpoint
-    Then client receives hello text and username
+Feature: the task endpoint can be retrieved
+  Scenario: client makes call to GET all tasks (empty list)
+    Given client wants to get all tasks
+    When client calls GET all tasks endpoint
+    Then client receives all tasks (empty list)
