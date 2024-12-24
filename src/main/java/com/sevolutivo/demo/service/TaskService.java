@@ -16,7 +16,7 @@ public class TaskService {
         return tasks;
     }
 
-    public void addTask(Task task) {
+    public Task addTask(Task task) {
         throwIfTaskIsInvalid(task);
         for(Task t : tasks) {
             if (t.getTitle().equals(task.getTitle())) {
@@ -25,6 +25,7 @@ public class TaskService {
         }
         task.setId(++id);
         tasks.add(task);
+        return task;
     }
 
     public Task getTask(int id) {
@@ -61,10 +62,7 @@ public class TaskService {
         if (task.getTitle().length() > 50) {
             throw new IllegalArgumentException("Task title is longer than 50");
         }
-        if (task.getDescription() == null || task.getDescription().isEmpty()) {
-            throw new IllegalArgumentException("Task description cannot be empty");
-        }
-        if (task.getDescription().length() > 50) {
+        if (!task.getDescription().isEmpty() && task.getDescription().length() > 50) {
             throw new IllegalArgumentException("Task description is longer than 50");
         }
     }
