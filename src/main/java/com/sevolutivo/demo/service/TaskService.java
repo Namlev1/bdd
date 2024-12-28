@@ -63,6 +63,22 @@ public class TaskService {
         return task;
     }
 
+    public void deleteTask(int id) {
+        int index = -1;
+        for (int i = 0; i < tasks.size(); ++i) {
+            if (tasks.get(i).getId() == id) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index == -1) {
+            throw new NoSuchElementException("No such Task");
+        }
+
+        tasks.remove(index);
+    }
+
     private void throwIfTaskIsInvalid(Task task) {
         if (task.getTitle() == null || task.getTitle().isEmpty()) {
             throw new IllegalArgumentException("Task title cannot be empty");

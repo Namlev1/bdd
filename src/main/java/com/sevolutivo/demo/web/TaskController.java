@@ -55,4 +55,14 @@ public class TaskController {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
     }
+
+    @DeleteMapping("/task/{id}")
+    public ResponseEntity<?> deleteTaskById(@PathVariable Integer id) {
+        try {
+            taskService.deleteTask(id);
+            return new ResponseEntity<>(HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.NOT_FOUND);
+        }
+    }
 }
