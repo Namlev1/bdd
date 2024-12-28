@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 
 @RestController
 @RequiredArgsConstructor
@@ -37,6 +38,19 @@ public class TaskController {
         try {
             task = taskService.addTask(task);
             return new ResponseEntity<>(task, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PatchMapping("/task/{id}")
+    public ResponseEntity<?> updateTask(@PathVariable Integer id, @RequestBody Task task) {
+        try {
+            task.setId(id);
+            task = taskService.updateTask(task);
+            return new ResponseEntity<>(task, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.NOT_FOUND);
         } catch (Exception e) {
             return new ResponseEntity<>(new ErrorMessage(e.getMessage()), HttpStatus.BAD_REQUEST);
         }
