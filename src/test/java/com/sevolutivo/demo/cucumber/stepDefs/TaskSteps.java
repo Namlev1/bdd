@@ -75,8 +75,15 @@ public class TaskSteps extends CucumberSpringConfiguration {
     public void clientReceivesStatusCodeNOT_FOUND() {
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
-    
-    private Task mapToTask(LinkedHashMap<String, Object> json){
+
+    @Then("client recieves task with id {int}, title {string}, description {string}")
+    public void clientHasATaskDescription(int id, String title, String description) {
+        Task expected = new Task(id, title, description);
+        Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
+        Assertions.assertEquals(expected, responseTask);
+    }
+
+    private Task mapToTask(LinkedHashMap<String, Object> json) {
         Task task = new Task();
         task.setId((Integer) json.get("id"));
         task.setTitle((String) json.get("title"));
