@@ -12,7 +12,7 @@ Feature: the task endpoint can be retrieved
   Scenario: client makes call to GET existing task
     Given client wants to get task by id 1
     When client calls GET task endpoint with id
-    Then client receives task with id 1
+    Then client recieves task with id 1, title "Buy milk", description ""
 
   Scenario: client makes call to GET non-existing task
     Given client wants to get task by id 2
