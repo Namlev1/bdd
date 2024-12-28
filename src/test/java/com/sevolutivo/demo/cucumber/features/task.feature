@@ -28,3 +28,13 @@ Feature: the task endpoint can be retrieved
     Given client has a task "Clean room", description "And chill"
     When client calls PATCH task endpoint with id 2
     Then client receives error code NOT_FOUND
+
+  Scenario: client makes call to DELETE existing task
+    Given client wants to delete task by id 1
+    When client calls DELETE task endpoint with id
+    Then client receives success
+
+  Scenario: client makes call to DELETE non-existing task
+    Given client wants to delete task by id 2
+    When client calls DELETE task endpoint with id
+    Then client receives error code NOT_FOUND

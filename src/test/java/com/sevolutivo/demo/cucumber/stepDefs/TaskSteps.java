@@ -41,6 +41,11 @@ public class TaskSteps extends CucumberSpringConfiguration {
         this.id = id;
     }
 
+    @Given("client wants to delete task by id {int}")
+    public void clientWantsToDeleteTaskById(int id) {
+        this.id = id;
+    }
+
     @When("client calls GET all tasks endpoint")
     public void clientCallsGetAllTasksEndpoint() {
         response = testRestTemplate.getForEntity("/task/all/", Object.class);
@@ -68,6 +73,17 @@ public class TaskSteps extends CucumberSpringConfiguration {
         response = testRestTemplate.getForEntity("/task/id/" + id, Object.class);
     }
 
+    @When("client calls DELETE task endpoint with id")
+    public void clientCallsDeleteTaskEndpoint() {
+        response = testRestTemplate.exchange("/task/" + id,
+                HttpMethod.DELETE,
+                HttpEntity.EMPTY,
+                // @formatter:off
+                new ParameterizedTypeReference<Object>() {}
+                // @formatter:on
+        );
+    }
+
     @Then("client receives all tasks \\(empty list)")
     public void clientReceivesAllTasksEmptyList() {
         List<Task> expectedTasks = new ArrayList<>();
@@ -84,6 +100,11 @@ public class TaskSteps extends CucumberSpringConfiguration {
     public void clientReceivesTaskWithId(int id) {
         Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
         Assertions.assertEquals(id, responseTask.getId());
+    }
+
+    @Then("client receives success")
+    public void clientReceivesStatusCodeOK() {
+        Assertions.assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Then("client receives error code NOT_FOUND")
