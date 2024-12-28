@@ -7,6 +7,8 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.cucumber.spring.CucumberContextConfiguration;
 import org.junit.jupiter.api.Assertions;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -20,6 +22,11 @@ public class TaskSteps extends CucumberSpringConfiguration {
     private ResponseEntity<Object> response;
     private Task task;
     private int id;
+
+    @Autowired
+    public TaskSteps(TestRestTemplate testRestTemplate) {
+        super(testRestTemplate);
+    }
 
     @Given("client has a task {string}, description {string}")
     public void clientHasATaskDescription(String title, String description) {
