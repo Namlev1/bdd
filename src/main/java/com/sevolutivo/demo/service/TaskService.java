@@ -47,10 +47,18 @@ public class TaskService {
     }
 
     public Task updateTask(Task task) {
-        int index = tasks.indexOf(task);
+        int index = -1;
+        for (int i = 0; i < tasks.size(); ++i) {
+            if (tasks.get(i).getId() == task.getId()) {
+                index = i;
+                break;
+            }
+        }
+
         if (index == -1) {
             throw new NoSuchElementException("No such Task");
         }
+
         tasks.set(index, task);
         return task;
     }
