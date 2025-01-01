@@ -38,3 +38,30 @@ Feature: the task endpoint can be retrieved
     Given client wants to delete task by id 2
     When client calls DELETE task endpoint with id
     Then client receives error code NOT_FOUND
+
+  Scenario: client makes call to POST with invalid task (empty title)
+    Given client has a task "", description "Description of the task"
+    When client calls POST task endpoint
+    Then client receives error code BAD_REQUEST
+
+  Scenario: client makes call to POST with invalid task (name longer than 50)
+    Given client has a task with title "This title is intentionally made longer than fifty characters for testing purposes", description "Valid description"
+    When client calls POST task endpoint
+    Then client receives error code BAD_REQUEST
+
+  Scenario: client makes call to POST with invalid task (description longer than 50)
+    Given client has a task with title "Valid title", description "This description is intentionally made longer than fifty characters for testing purposes"
+    When client calls POST task endpoint
+    Then client receives error code BAD_REQUEST
+
+  Scenario: client retrieves tasks when there are multiple tasks
+    Given client has created tasks with titles "Task 1", "Task 2", "Task 3"
+    When client calls GET all tasks endpoint
+    Then client receives a list containing "Task 1", "Task 2", "Task 3"
+
+  Scenario: client makes call to POST with duplicate task title
+    Given client has a task "Duplicate Title", description "First task"
+    And client calls POST task endpoint
+    And client has a task "Duplicate Title", description "Second task"
+    When client calls POST task endpoint
+    Then client receives error code BAD_REQUEST

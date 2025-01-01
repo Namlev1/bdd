@@ -46,6 +46,23 @@ public class TaskSteps extends CucumberSpringConfiguration {
         this.id = id;
     }
 
+    @Given("client has a task {string}, description null")
+    public void clientHasATaskDescriptionNull(String title) {
+        task = new Task(0, title, null);
+    }
+
+    @Given("client has a task with title {string}, description {string}")
+    public void clientHasATaskWithTitleAndDescription(String title, String description) {
+        task = new Task(0, title, description);
+    }
+
+    @Given("client has created tasks with titles {string}, {string}, {string}")
+    public void clientHasCreatedTasksWithTitles(String title1, String title2, String title3) {
+        testRestTemplate.postForEntity("/task/", new Task(0, title1, ""), Object.class);
+        testRestTemplate.postForEntity("/task/", new Task(0, title2, ""), Object.class);
+        testRestTemplate.postForEntity("/task/", new Task(0, title3, ""), Object.class);
+    }
+
     @When("client calls GET all tasks endpoint")
     public void clientCallsGetAllTasksEndpoint() {
         response = testRestTemplate.getForEntity("/task/all/", Object.class);
@@ -63,7 +80,8 @@ public class TaskSteps extends CucumberSpringConfiguration {
                 HttpMethod.PATCH,
                 new HttpEntity<>(task),
                 // @formatter:off
-                new ParameterizedTypeReference<Object>() {}
+                new ParameterizedTypeReference<Object>() {
+                }
                 // @formatter:on
         );
     }
@@ -79,7 +97,8 @@ public class TaskSteps extends CucumberSpringConfiguration {
                 HttpMethod.DELETE,
                 HttpEntity.EMPTY,
                 // @formatter:off
-                new ParameterizedTypeReference<Object>() {}
+                new ParameterizedTypeReference<Object>() {
+                }
                 // @formatter:on
         );
     }
@@ -117,6 +136,18 @@ public class TaskSteps extends CucumberSpringConfiguration {
         Task expected = new Task(id, title, description);
         Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
         Assertions.assertEquals(expected, responseTask);
+    }
+
+    @Then("client receives error code BAD_REQUEST")
+    public void clientReceivesStatusCodeBAD_REQUEST() {
+        Assertions.assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Then("client receives a list containing {string}, {string}, {string}")
+    public void clientReceivesAListContaining(String title1, String title2, String title3) {
+        List<LinkedHashMap<String, Object>> tasks = (List<LinkedHashMap<String, Object>>) response.getBody();
+        List<String> titles = tasks.stream().map(t -> (String) t.get("title")).toList();
+        Assertions.assertTrue(titles.containsAll(List.of(title1, title2, title3)));
     }
 
     private Task mapToTask(LinkedHashMap<String, Object> json) {
