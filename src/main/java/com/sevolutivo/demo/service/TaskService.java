@@ -90,4 +90,10 @@ public class TaskService {
             throw new IllegalArgumentException("Task description is longer than 50");
         }
     }
+
+    public void deleteAllTasks() {
+        tasks.clear();
+    }
+
+
 }

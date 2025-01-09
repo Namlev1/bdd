@@ -32,7 +32,12 @@ public class TaskSteps extends CucumberSpringConfiguration {
     }
 
     @Given("client has a task {string}, description {string}")
-    public void clientHasATaskDescription(String title, String description) {
+    public void clientHasATaskWithDescription(String title, String description) {
+        task = new Task(0, title, description);
+    }
+
+    @Given("client has a task with title {string}, description {string}")
+    public void clientHasATaskWithTitleAndDescription(String title, String description) {
         task = new Task(0, title, description);
     }
 
@@ -46,21 +51,22 @@ public class TaskSteps extends CucumberSpringConfiguration {
         this.id = id;
     }
 
-    @Given("client has a task {string}, description null")
-    public void clientHasATaskDescriptionNull(String title) {
-        task = new Task(0, title, null);
-    }
-
-    @Given("client has a task with title {string}, description {string}")
-    public void clientHasATaskWithTitleAndDescription(String title, String description) {
-        task = new Task(0, title, description);
-    }
-
     @Given("client has created tasks with titles {string}, {string}, {string}")
     public void clientHasCreatedTasksWithTitles(String title1, String title2, String title3) {
         testRestTemplate.postForEntity("/task/", new Task(0, title1, ""), Object.class);
         testRestTemplate.postForEntity("/task/", new Task(0, title2, ""), Object.class);
         testRestTemplate.postForEntity("/task/", new Task(0, title3, ""), Object.class);
+    }
+
+    @Given("no tasks exist")
+    public void no_tasks_exist() {
+        cleanUpTasks();
+    }
+
+    private void cleanUpTasks() {
+        testRestTemplate.delete("/task/all");
+        ResponseEntity<List> response = testRestTemplate.getForEntity("/task/all", List.class);
+        Assertions.assertTrue(response.getBody().isEmpty(), "The task list is not empty after cleanup.");
     }
 
     @When("client calls GET all tasks endpoint")
@@ -79,10 +85,7 @@ public class TaskSteps extends CucumberSpringConfiguration {
                 "/task/" + id,
                 HttpMethod.PATCH,
                 new HttpEntity<>(task),
-                // @formatter:off
-                new ParameterizedTypeReference<Object>() {
-                }
-                // @formatter:on
+                new ParameterizedTypeReference<Object>() {}
         );
     }
 
@@ -96,29 +99,15 @@ public class TaskSteps extends CucumberSpringConfiguration {
         response = testRestTemplate.exchange("/task/" + id,
                 HttpMethod.DELETE,
                 HttpEntity.EMPTY,
-                // @formatter:off
-                new ParameterizedTypeReference<Object>() {
-                }
-                // @formatter:on
+                new ParameterizedTypeReference<Object>() {}
         );
     }
 
-    @Then("client receives all tasks \\(empty list)")
-    public void clientReceivesAllTasksEmptyList() {
-        List<Task> expectedTasks = new ArrayList<>();
-        Assertions.assertEquals(expectedTasks, response.getBody());
-    }
-
-    @Then("client receives task with assigned id")
-    public void clientReceivesTaskWithAssignedId() {
+    @Then("client receives task with id {int}, title {string}, description {string}")
+    public void clientReceivesTaskWithIdTitleDescription(int id, String title, String description) {
+        Task expected = new Task(id, title, description);
         Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
-        Assertions.assertNotEquals(0, responseTask.getId());
-    }
-
-    @Then("client receives task with id {int}")
-    public void clientReceivesTaskWithId(int id) {
-        Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
-        Assertions.assertEquals(id, responseTask.getId());
+        Assertions.assertEquals(expected, responseTask);
     }
 
     @Then("client receives success")
@@ -129,13 +118,6 @@ public class TaskSteps extends CucumberSpringConfiguration {
     @Then("client receives error code NOT_FOUND")
     public void clientReceivesStatusCodeNOT_FOUND() {
         Assertions.assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-    @Then("client recieves task with id {int}, title {string}, description {string}")
-    public void clientHasATaskDescription(int id, String title, String description) {
-        Task expected = new Task(id, title, description);
-        Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
-        Assertions.assertEquals(expected, responseTask);
     }
 
     @Then("client receives error code BAD_REQUEST")
@@ -150,11 +132,78 @@ public class TaskSteps extends CucumberSpringConfiguration {
         Assertions.assertTrue(titles.containsAll(List.of(title1, title2, title3)));
     }
 
+    @Then("client receives all tasks \\(empty list)")
+    public void clientReceivesAllTasksEmptyList() {
+        List<Task> expectedTasks = new ArrayList<>();
+        Assertions.assertEquals(expectedTasks, response.getBody());
+    }
+
+    @When("client updates task with empty title")
+    public void clientUpdatesTaskWithEmptyTitle() {
+        task.setTitle("");
+        response = testRestTemplate.exchange(
+                "/task/" + task.getId(),
+                HttpMethod.PATCH,
+                new HttpEntity<>(task),
+                new ParameterizedTypeReference<Object>() {}
+        );
+    }
+
     private Task mapToTask(LinkedHashMap<String, Object> json) {
         Task task = new Task();
-        task.setId((Integer) json.get("id"));
-        task.setTitle((String) json.get("title"));
-        task.setDescription((String) json.get("description"));
+        if (json.containsKey("id") && json.get("id") != null) {
+            task.setId(((Number) json.get("id")).intValue());
+        } else {
+            throw new IllegalArgumentException("Response does not contain valid 'id'");
+        }
+
+        if (json.containsKey("title") && json.get("title") != null) {
+            task.setTitle((String) json.get("title"));
+        } else {
+            throw new IllegalArgumentException("Response does not contain valid 'title'");
+        }
+
+        if (json.containsKey("description")) {
+            task.setDescription((String) json.get("description"));
+        }
+
         return task;
     }
+
+    @Given("client wants to get task by id {string}")
+    public void clientWantsToGetTaskById(String id) {
+        try {
+            this.id = Integer.parseInt(id);
+        } catch (NumberFormatException e) {
+            this.id = -1; // oznacza błędny format ID
+        }
+    }
+
+    @When("client calls DELETE task endpoint with id {int} again")
+    public void clientCallsDeleteTaskEndpointWithIdAgain(Integer id) {
+        response = testRestTemplate.exchange("/task/" + id,
+                HttpMethod.DELETE,
+                HttpEntity.EMPTY,
+                new ParameterizedTypeReference<Object>() {}
+        );
+    }
+
+    @When("client updates the description to {string} and calls PATCH task endpoint with id {int}")
+    public void clientUpdatesTheDescription(String description, int id) {
+        this.task.setDescription(description);
+        response = testRestTemplate.exchange(
+                "/task/" + id,
+                HttpMethod.PATCH,
+                new HttpEntity<>(task),
+                new ParameterizedTypeReference<>() {}
+        );
+    }
+
+    @Then("client receives task with assigned id")
+    public void clientReceivesTaskWithAssignedId() {
+        Task responseTask = mapToTask((LinkedHashMap<String, Object>) response.getBody());
+        Assertions.assertNotEquals(0, responseTask.getId(), "The task ID should be assigned and not 0.");
+    }
+
+
 }
