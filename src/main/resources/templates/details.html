@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Task details</title>
+    <link rel="stylesheet" th:href="@{/styles.css}"/>
+</head>
+<body>
+<h1>Task details</h1>
+<form method="post" th:action="@{/details}" th:object="${task}">
+    <input th:name="id" th:value="${task.getId()}" type="hidden"/>
+    <label>Title:</label>
+    <input required th:name="title" th:value="${task.getTitle()}" type="text"/>
+    <label>Description:</label>
+    <input th:name="description" th:value="${task.getDescription()}" type="text"/>
+
+    <button type="submit">Save Changes</button>
+</form>
+</body>
+</html>

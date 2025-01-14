@@ -5,7 +5,19 @@
     <link th:href="@{/styles.css}" rel="stylesheet"/>
 </head>
 <body>
-<h1>Home</h1>
+<h1>Todo list</h1>
 <a th:href="@{/new}">New task</a>
+<div class="tasks">
+    <div class="task" th:each="task : ${tasks}">
+        <div class="task-text">
+            <p th:text="${task.getTitle()}"></p>
+            <p th:text="${task.getDescription()}"></p>
+        </div>
+        <div class="task-actions">
+            <a th:href="@{/details/{id}(id=${task.getId()})}">Details</a>
+            <a th:href="@{/delete/{id}(id=${task.getId()})}">Delete</a>
+        </div>
+    </div>
+</div>
 </body>
 </html>
