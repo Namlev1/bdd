@@ -68,3 +68,17 @@ body {
 .task-actions > .btn {
     width: min-content;
 }
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    padding: .5rem 1rem;
+    border: 2px solid var(--purple);
+    border-radius: 8px;
+}
+
+form > div {
+    display: flex;
+    flex-direction: column;
+}
