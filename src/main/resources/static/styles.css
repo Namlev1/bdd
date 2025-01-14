@@ -3,6 +3,7 @@
     font-family: system-ui, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     --background: #f6f7f6;
     --purple: #6c62fe;
+    --light-purple: #b3adff;
     color: black;
 }
 
@@ -37,6 +38,11 @@ body {
     border-radius: 8px;
     color: var(--background);
     border: 2px black solid;
+    transition: background-color ease-in 200ms;
+}
+
+.btn:hover {
+    background-color: var(--light-purple);
 }
 
 .tasks {
