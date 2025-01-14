@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequiredArgsConstructor
 public class TaskPageController {
     private final TaskService service;
-    
+
     @GetMapping("/")
     public String homePage(Model model) {
         model.addAttribute("tasks", service.getTasks());
@@ -27,9 +27,14 @@ public class TaskPageController {
     }
 
     @PostMapping("/new")
-    public String addTask(@ModelAttribute Task task) {
-        service.addTask(task);
-        return "redirect:/";
+    public String addTask(@ModelAttribute Task task, Model model) {
+        try {
+            service.addTask(task);
+            return "redirect:/";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "new";
+        }
     }
 
     @GetMapping("/details/{id}")
@@ -39,9 +44,14 @@ public class TaskPageController {
     }
 
     @PostMapping("/details")
-    public String edit(@ModelAttribute Task task) {
-        service.updateTask(task);
-        return "redirect:/";
+    public String edit(@ModelAttribute Task task, Model model) {
+        try {
+            service.updateTask(task);
+            return "redirect:/";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", e.getMessage());
+            return "details";
+        }
     }
 
     @GetMapping("/delete/{id}")

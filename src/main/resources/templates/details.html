@@ -19,6 +19,9 @@
         </div>
         <button class="btn" type="submit">Save Changes</button>
     </form>
+    <div class="error" th:if="${errorMessage}">
+        <p th:text="${errorMessage}"></p>
+    </div>
 </div>
 </body>
 </html>
