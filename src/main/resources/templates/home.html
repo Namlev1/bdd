@@ -11,12 +11,12 @@
     <div class="tasks">
         <div class="task" th:each="task : ${tasks}">
             <div class="task-text">
-                <h2 th:text="${task.getTitle()}"></h2>
-                <p class="description" th:text="${task.getDescription()}"></p>
+                <h2 id="task-title" th:text="${task.getTitle()}"></h2>
+                <p id="task-description" class="description" th:text="${task.getDescription()}"></p>
             </div>
             <div class="task-actions">
-                <a class="btn" th:href="@{/details/{id}(id=${task.getId()})}">Details</a>
-                <a class="btn" th:href="@{/delete/{id}(id=${task.getId()})}">Delete</a>
+                <a id="task-details" class="btn" th:href="@{/details/{id}(id=${task.getId()})}">Details</a>
+                <a id="task-delete" class="btn" th:href="@{/delete/{id}(id=${task.getId()})}">Delete</a>
             </div>
         </div>
     </div>
