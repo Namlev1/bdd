@@ -10,13 +10,12 @@ import java.util.NoSuchElementException;
 @Service
 public class TaskService {
     private final List<Task> tasks;
-    private int id;
+    private int id = 0;
 
     public TaskService() {
         tasks = new ArrayList<>();
-        id = 0;
-        addTask(new Task(id++, "Buy milk", "Go to the store and just buy it"));
-        addTask(new Task(id++, "Work out", "There is a sale at local gym"));
+        addTask(new Task(0, "Buy milk", "Go to the store and just buy it"));
+        addTask(new Task(0, "Work out", "There is a sale at local gym"));
     }
 
     public List<Task> getTasks() {
@@ -25,7 +24,7 @@ public class TaskService {
 
     public Task addTask(Task task) {
         throwIfTaskIsInvalid(task);
-        for(Task t : tasks) {
+        for (Task t : tasks) {
             if (t.getTitle().equals(task.getTitle())) {
                 throw new IllegalArgumentException("Task title already exists");
             }
@@ -102,6 +101,5 @@ public class TaskService {
     public void deleteAllTasks() {
         tasks.clear();
     }
-
 
 }
