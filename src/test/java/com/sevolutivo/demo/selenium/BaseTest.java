@@ -4,6 +4,7 @@ import com.sevolutivo.seleniumPages.BasePage;
 import com.sevolutivo.seleniumPages.TodoListPage;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.firefox.FirefoxDriver;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
@@ -16,7 +17,7 @@ public class BaseTest {
 
     @BeforeClass
     public void setUp(){
-        driver = new ChromeDriver();
+        driver = new FirefoxDriver();
         driver.manage().window().maximize();
         driver.get(url);
 

@@ -10,13 +10,13 @@
     <form method="post" th:action="@{/new}">
         <div>
             <label for="title">Title:</label>
-            <input id="title" name="title" required type="text"/>
+            <input data-testid="titleInput" id="title" name="title" required type="text"/>
         </div>
         <div>
             <label for="description">Description:</label>
-            <input id="description" name="description" type="text"/>
+            <input data-testid="descriptionInput" id="description" name="description" type="text"/>
         </div>
-        <button class="btn" type="submit">Add</button>
+        <button data-testid="submitChanges" class="btn" type="submit">Add</button>
     </form>
     <div class="error" th:if="${errorMessage}">
         <p th:text="${errorMessage}"></p>
